@@ -77,22 +77,15 @@ jobs:
             source: "./coverage.html"
             target: "/var/www/group2/"
   
-  container:
+  smoke:
     runs-on: ubuntu-latest
     needs: tests
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Login container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build and push
+      - name: Build
         uses: docker/build-push-action@v5
         with:
             context: .
@@ -116,6 +109,30 @@ jobs:
           # Container stoppen
           docker stop test-container
 
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: .
+            push: ${{ github.ref_name == 'main' }}
+            tags: |
+                ghcr.io/florianpall/templatezwei:latest
+                ghcr.io/florianpall/templatezwei:${{ github.sha }}
+
+  container:
+    runs-on: ubuntu-latest
+    needs: smoke
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Login container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
