@@ -122,5 +122,5 @@ jobs:
             context: .
             push: ${{ github.ref_name == 'main' }}
             tags: |
-                ghcr.io/florianpall/template:latest
-                ghcr.io/florianpall/template:${{ github.sha }}
+                ghcr.io/florianpall/templatezwei:latest
+                ghcr.io/florianpall/templatezwei:${{ github.sha }}
