@@ -96,7 +96,32 @@ jobs:
         uses: docker/build-push-action@v5
         with:
             context: .
-            push: ${{ github.ref_name == 'main' }}
+            push: false
+            load: true
             tags: |
               ghcr.io/florianpall/template:latest
               ghcr.io/florianpall/template:${{ github.sha }}
+
+      - name: Smoke weed everyday
+        run: |
+          # Container im Hintergrund starten
+          docker run -d -p 8080:8080 --name test-container ghcr.io/florianpall/template:latest
+          
+          # Warten bis der Container bereit ist
+          sleep 10
+          
+          # Smoke Tests ausführen
+          cd backend
+          go run ./cmd/smoketest/
+          
+          # Container stoppen
+          docker stop test-container
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: .
+            push: ${{ github.ref_name == 'main' }}
+            tags: |
+                ghcr.io/florianpall/template:latest
+                ghcr.io/florianpall/template:${{ github.sha }}
