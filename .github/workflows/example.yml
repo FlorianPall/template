@@ -104,7 +104,6 @@ jobs:
 
       - name: Smoke weed everyday
         run: |
-          # Container im Hintergrund starten
           docker run -d -p 8080:8080 --name test-container ghcr.io/florianpall/template:latest
           
           # Warten bis der Container bereit ist
